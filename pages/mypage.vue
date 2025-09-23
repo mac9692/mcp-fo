@@ -39,7 +39,36 @@
       <div v-if="activeTab === 'profile'" class="bg-white rounded-lg shadow p-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">프로필 정보</h2>
 
-        <form class="space-y-6">
+        <!-- 로딩 상태 -->
+        <div v-if="loading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span class="ml-2 text-gray-600">사용자 정보를 불러오는 중...</span>
+        </div>
+
+        <!-- 에러 상태 -->
+        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">오류 발생</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>{{ error }}</p>
+              </div>
+              <div class="mt-4">
+                <button @click="loadUserInfo()" class="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200">
+                  다시 시도
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 프로필 폼 -->
+        <form v-else class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
@@ -59,13 +88,24 @@
             </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
-            <input
-              type="tel"
-              v-model="profile.phone"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+              <input
+                type="tel"
+                v-model="profile.phone"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">생년월일</label>
+              <input
+                type="text"
+                v-model="profile.birthDate"
+                readonly
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+              />
+            </div>
           </div>
 
           <div>
@@ -74,7 +114,17 @@
               type="text"
               v-model="profile.address"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="기본 배송지"
+              placeholder="기본 배송지를 입력하세요"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">첫 로그인 일시</label>
+            <input
+              type="text"
+              v-model="profile.firstLoginDate"
+              readonly
+              class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
             />
           </div>
 
@@ -162,18 +212,75 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 
 // 활성 탭 상태
 const activeTab = ref('profile')
 
 // 프로필 정보
 const profile = ref({
-  name: '홍길동',
-  email: 'hong@example.com',
-  phone: '010-1234-5678',
-  address: '서울시 강남구 테헤란로 123'
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  birthDate: '',
+  firstLoginDate: ''
+})
+
+// 로딩 상태
+const loading = ref(true)
+const error = ref('')
+
+// API 호출
+const { getUserInfo } = useUserApi()
+
+// 사용자 정보 로드
+const loadUserInfo = async () => {
+  try {
+    loading.value = true
+    error.value = ''
+
+    console.log('API 호출 시작: getUserInfo with userId=1')
+
+    const response = await getUserInfo('1') // 고정된 ID 1 사용
+
+    console.log('API 응답:', response)
+
+    if (response.error) {
+      error.value = response.error
+      console.error('API 에러:', response.error)
+      return
+    }
+
+    if (response.data) {
+      const userInfo = response.data
+      console.log('사용자 정보:', userInfo)
+
+      profile.value = {
+        name: userInfo.userNm,
+        email: userInfo.userEmail,
+        phone: userInfo.userPhone,
+        address: '', // 주소는 아직 API에 없으므로 빈값
+        birthDate: userInfo.userBirthDt,
+        firstLoginDate: userInfo.userFirstLoginDtm || '로그인 이력 없음'
+      }
+
+      console.log('프로필 설정 완료:', profile.value)
+    } else {
+      error.value = 'API에서 데이터를 받지 못했습니다.'
+    }
+  } catch (err) {
+    error.value = '사용자 정보를 불러오는데 실패했습니다.'
+    console.error('Error loading user info:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 컴포넌트 마운트 시 사용자 정보 로드
+onMounted(() => {
+  loadUserInfo()
 })
 
 // 주문내역 샘플 데이터
