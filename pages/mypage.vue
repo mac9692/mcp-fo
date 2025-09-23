@@ -1,0 +1,221 @@
+<template>
+  <div class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- 페이지 헤더 -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">마이페이지</h1>
+        <p class="mt-2 text-gray-600">회원정보 및 주문내역을 확인하실 수 있습니다.</p>
+      </div>
+
+      <!-- 탭 네비게이션 -->
+      <div class="mb-8">
+        <nav class="flex space-x-8">
+          <button
+            @click="activeTab = 'profile'"
+            :class="[
+              'py-2 px-1 border-b-2 font-medium text-sm',
+              activeTab === 'profile'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            ]"
+          >
+            프로필 관리
+          </button>
+          <button
+            @click="activeTab = 'orders'"
+            :class="[
+              'py-2 px-1 border-b-2 font-medium text-sm',
+              activeTab === 'orders'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            ]"
+          >
+            주문내역
+          </button>
+        </nav>
+      </div>
+
+      <!-- 프로필 관리 탭 -->
+      <div v-if="activeTab === 'profile'" class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">프로필 정보</h2>
+
+        <form class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+              <input
+                type="text"
+                v-model="profile.name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <input
+                type="email"
+                v-model="profile.email"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+            <input
+              type="tel"
+              v-model="profile.phone"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
+            <input
+              type="text"
+              v-model="profile.address"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="기본 배송지"
+            />
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
+            >
+              정보 수정
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 주문내역 탭 -->
+      <div v-if="activeTab === 'orders'" class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">주문내역</h2>
+        </div>
+
+        <div class="p-6">
+          <!-- 주문 목록 -->
+          <div v-for="order in orders" :key="order.id" class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-lg font-medium text-gray-900">주문번호: {{ order.orderNumber }}</h3>
+                <p class="text-sm text-gray-500">{{ order.date }}</p>
+              </div>
+              <span :class="[
+                'px-3 py-1 rounded-full text-xs font-medium',
+                order.status === '배송완료'
+                  ? 'bg-green-100 text-green-800'
+                  : order.status === '배송중'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              ]">
+                {{ order.status }}
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              <div v-for="item in order.items" :key="item.id" class="flex items-center space-x-4">
+                <img :src="item.image" :alt="item.name" class="w-16 h-16 object-cover rounded-lg" />
+                <div class="flex-1">
+                  <h4 class="text-sm font-medium text-gray-900">{{ item.name }}</h4>
+                  <p class="text-sm text-gray-500">수량: {{ item.quantity }}개</p>
+                </div>
+                <div class="text-sm font-medium text-gray-900">
+                  ₩{{ item.price.toLocaleString() }}
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center">
+              <span class="text-lg font-semibold text-gray-900">
+                총 결제금액: ₩{{ order.total.toLocaleString() }}
+              </span>
+              <div class="space-x-2">
+                <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  주문상세
+                </button>
+                <button v-if="order.status === '배송완료'" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                  후기작성
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 주문내역이 없는 경우 -->
+          <div v-if="orders.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">주문내역이 없습니다</h3>
+            <p class="mt-1 text-sm text-gray-500">첫 주문을 시작해보세요!</p>
+            <div class="mt-6">
+              <NuxtLink to="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                쇼핑하러 가기
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+// 활성 탭 상태
+const activeTab = ref('profile')
+
+// 프로필 정보
+const profile = ref({
+  name: '홍길동',
+  email: 'hong@example.com',
+  phone: '010-1234-5678',
+  address: '서울시 강남구 테헤란로 123'
+})
+
+// 주문내역 샘플 데이터
+const orders = ref([
+  {
+    id: 1,
+    orderNumber: 'ORD20241201001',
+    date: '2024년 12월 1일',
+    status: '배송완료',
+    total: 288000,
+    items: [
+      {
+        id: 1,
+        name: '프리미엄 무선 헤드폰',
+        quantity: 1,
+        price: 159000,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        id: 2,
+        name: '스마트 워치',
+        quantity: 1,
+        price: 129000,
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      }
+    ]
+  },
+  {
+    id: 2,
+    orderNumber: 'ORD20241125001',
+    date: '2024년 11월 25일',
+    status: '배송중',
+    total: 89000,
+    items: [
+      {
+        id: 3,
+        name: '노트북 백팩',
+        quantity: 1,
+        price: 89000,
+        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      }
+    ]
+  }
+])
+</script>
