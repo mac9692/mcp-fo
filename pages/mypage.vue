@@ -215,6 +215,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+// 인증 미들웨어 적용
+definePageMeta({
+  middleware: ['auth']
+})
+
 // 활성 탭 상태
 const activeTab = ref('profile')
 

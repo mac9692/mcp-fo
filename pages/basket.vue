@@ -193,6 +193,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+// 인증 미들웨어 적용
+definePageMeta({
+  middleware: ['auth']
+})
+
 // 장바구니 아이템 데이터
 const basketItems = ref([
   {

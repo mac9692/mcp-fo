@@ -312,6 +312,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+// 인증 미들웨어 적용
+definePageMeta({
+  middleware: ['auth']
+})
+
 // 주문 상품 데이터 (장바구니에서 전달받은 데이터)
 const orderItems = ref([
   {
