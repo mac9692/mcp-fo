@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.js.mcpapi.mapper.UserMapper">
+
+    <select id="selectUserInfo" parameterType="string" resultType="com.js.mcpapi.dto.UserInfoDto">
+        SELECT
+            user_id as userId,
+            user_nm as userNm,
+            user_email as userEmail,
+            user_phone as userPhone,
+            user_birth_dt as userBirthDt,
+            user_first_login_dtm as userFirstLoginDtm
+        FROM st_user_base
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUser" parameterType="com.js.mcpapi.dto.RegisterRequestDto">
+        INSERT INTO st_user_base (
+            user_id,
+            user_nm,
+            user_email,
+            user_phone,
+            user_birth_dt,
+            sys_reg_id,
+            sys_reg_dtm,
+            sys_mod_id,
+            sys_mod_dtm
+        ) VALUES (
+            #{userId},
+            #{userNm},
+            #{userEmail},
+            #{userPhone},
+            #{userBirthDt}::date,
+            #{userId},
+            NOW(),
+            #{userId},
+            NOW()
+        )
+    </insert>
+
+    <insert id="insertUserAuth">
+        INSERT INTO st_user_auth (
+            user_id,
+            user_password,
+            password_salt,
+            auth_provider,
+            is_active,
+            sys_reg_id,
+            sys_reg_dtm,
+            sys_mod_id,
+            sys_mod_dtm
+        ) VALUES (
+            #{userId},
+            #{password},
+            '',
+            'local',
+            true,
+            #{userId},
+            NOW(),
+            #{userId},
+            NOW()
+        )
+    </insert>
+
+    <select id="checkUserExists" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM st_user_base
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectUserPassword" parameterType="string" resultType="string">
+        SELECT user_password
+        FROM st_user_auth
+        WHERE user_id = #{userId}
+          AND is_active = true
+    </select>
+
+    <update id="updateFirstLoginTime" parameterType="string">
+        UPDATE st_user_base
+        SET user_first_login_dtm = NOW(),
+            sys_mod_id = #{userId},
+            sys_mod_dtm = NOW()
+        WHERE user_id = #{userId}
+          AND user_first_login_dtm IS NULL
+    </update>
+
+    <update id="updateLastLoginTime" parameterType="string">
+        UPDATE st_user_auth
+        SET last_login_dtm = NOW(),
+            login_fail_count = 0,
+            sys_mod_id = #{userId},
+            sys_mod_dtm = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>
