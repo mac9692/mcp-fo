@@ -15,11 +15,11 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
-            <label for="userId" class="sr-only">사용자 ID</label>
+            <label for="userLoginId" class="sr-only">사용자 ID</label>
             <input
-              id="userId"
-              v-model="loginForm.userId"
-              name="userId"
+              id="userLoginId"
+              v-model="loginForm.userLoginId"
+              name="userLoginId"
               type="text"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -76,13 +76,13 @@
 
 <script setup lang="ts">
 interface LoginForm {
-  userId: string
+  userLoginId: string
   password: string
   rememberMe: boolean
 }
 
 const loginForm = ref<LoginForm>({
-  userId: '',
+  userLoginId: '',
   password: '',
   rememberMe: false
 })
@@ -91,7 +91,7 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 
 const handleLogin = async () => {
-  if (!loginForm.value.userId || !loginForm.value.password) {
+  if (!loginForm.value.userLoginId || !loginForm.value.password) {
     errorMessage.value = 'ID와 비밀번호를 모두 입력해주세요.'
     return
   }
@@ -104,7 +104,7 @@ const handleLogin = async () => {
     const response = await $fetch('http://localhost:8080/api/auth/login', {
       method: 'POST',
       body: {
-        userId: loginForm.value.userId,
+        userLoginId: loginForm.value.userLoginId,
         password: loginForm.value.password
       }
     })

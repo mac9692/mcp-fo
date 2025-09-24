@@ -1,10 +1,12 @@
 export interface UserInfo {
-  userId: string;
+  userLoginId: string;
   userNm: string;
   userEmail: string;
   userPhone: string;
   userBirthDt: string;
   userFirstLoginDtm: string | null;
+  pointBalance: number;
+  coinBalance: number;
 }
 
 export interface UserRequest {

@@ -15,11 +15,11 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="space-y-4">
           <div>
-            <label for="userId" class="block text-sm font-medium text-gray-700">사용자 ID *</label>
+            <label for="userLoginId" class="block text-sm font-medium text-gray-700">사용자 ID *</label>
             <input
-              id="userId"
-              v-model="registerForm.userId"
-              name="userId"
+              id="userLoginId"
+              v-model="registerForm.userLoginId"
+              name="userLoginId"
               type="text"
               required
               class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -129,7 +129,7 @@
 
 <script setup lang="ts">
 interface RegisterForm {
-  userId: string
+  userLoginId: string
   password: string
   confirmPassword: string
   userNm: string
@@ -139,7 +139,7 @@ interface RegisterForm {
 }
 
 const registerForm = ref<RegisterForm>({
-  userId: '',
+  userLoginId: '',
   password: '',
   confirmPassword: '',
   userNm: '',
@@ -153,7 +153,7 @@ const errorMessage = ref('')
 const successMessage = ref('')
 
 const validateForm = (): boolean => {
-  if (!registerForm.value.userId || !registerForm.value.password ||
+  if (!registerForm.value.userLoginId || !registerForm.value.password ||
       !registerForm.value.userNm || !registerForm.value.userEmail ||
       !registerForm.value.userPhone || !registerForm.value.userBirthDt) {
     errorMessage.value = '모든 필수 항목을 입력해주세요.'
@@ -200,7 +200,7 @@ const handleRegister = async () => {
     const response = await $fetch('http://localhost:8080/api/auth/register', {
       method: 'POST',
       body: {
-        userId: registerForm.value.userId,
+        userLoginId: registerForm.value.userLoginId,
         password: registerForm.value.password,
         userNm: registerForm.value.userNm,
         userEmail: registerForm.value.userEmail,

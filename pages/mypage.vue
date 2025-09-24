@@ -36,107 +36,147 @@
       </div>
 
       <!-- 프로필 관리 탭 -->
-      <div v-if="activeTab === 'profile'" class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">프로필 정보</h2>
+      <div v-if="activeTab === 'profile'" class="space-y-6">
+        <!-- 자산 정보 섹션 -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">자산 정보</h2>
 
-        <!-- 로딩 상태 -->
-        <div v-if="loading" class="flex justify-center items-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span class="ml-2 text-gray-600">사용자 정보를 불러오는 중...</span>
-        </div>
-
-        <!-- 에러 상태 -->
-        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">오류 발생</h3>
-              <div class="mt-2 text-sm text-red-700">
-                <p>{{ error }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 포인트 카드 -->
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-medium text-blue-900">포인트</h3>
+                  <p class="text-2xl font-bold text-blue-600 mt-2">{{ pointBalance.toLocaleString() }}P</p>
+                </div>
+                <div class="bg-blue-200 p-3 rounded-full">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
               </div>
-              <div class="mt-4">
-                <button @click="loadUserInfo()" class="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200">
-                  다시 시도
-                </button>
+            </div>
+
+            <!-- 코인 카드 -->
+            <div class="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-medium text-amber-900">코인</h3>
+                  <p class="text-2xl font-bold text-amber-600 mt-2">{{ coinBalance.toLocaleString() }}C</p>
+                </div>
+                <div class="bg-amber-200 p-3 rounded-full">
+                  <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 프로필 폼 -->
-        <form v-else class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
-              <input
-                type="text"
-                v-model="profile.name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-              <input
-                type="email"
-                v-model="profile.email"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        <!-- 프로필 정보 섹션 -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">프로필 정보</h2>
+
+          <!-- 로딩 상태 -->
+          <div v-if="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-2 text-gray-600">사용자 정보를 불러오는 중...</span>
+          </div>
+
+          <!-- 에러 상태 -->
+          <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">오류 발생</h3>
+                <div class="mt-2 text-sm text-red-700">
+                  <p>{{ error }}</p>
+                </div>
+                <div class="mt-4">
+                  <button @click="loadUserInfo()" class="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200">
+                    다시 시도
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
-              <input
-                type="tel"
-                v-model="profile.phone"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+          <!-- 프로필 폼 -->
+          <form v-else class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                <input
+                  type="text"
+                  v-model="profile.name"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                <input
+                  type="email"
+                  v-model="profile.email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+                <input
+                  type="tel"
+                  v-model="profile.phone"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">생년월일</label>
+                <input
+                  type="text"
+                  v-model="profile.birthDate"
+                  readonly
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                />
+              </div>
+            </div>
+
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">생년월일</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
               <input
                 type="text"
-                v-model="profile.birthDate"
+                v-model="profile.address"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="기본 배송지를 입력하세요"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">첫 로그인 일시</label>
+              <input
+                type="text"
+                v-model="profile.firstLoginDate"
                 readonly
                 class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
               />
             </div>
-          </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
-            <input
-              type="text"
-              v-model="profile.address"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="기본 배송지를 입력하세요"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">첫 로그인 일시</label>
-            <input
-              type="text"
-              v-model="profile.firstLoginDate"
-              readonly
-              class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
-            />
-          </div>
-
-          <div class="flex justify-end">
-            <button
-              type="submit"
-              class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
-            >
-              정보 수정
-            </button>
-          </div>
-        </form>
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
+              >
+                정보 수정
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- 주문내역 탭 -->
@@ -233,12 +273,17 @@ const profile = ref({
   firstLoginDate: ''
 })
 
+// 자산 정보
+const pointBalance = ref(0)
+const coinBalance = ref(0)
+
 // 로딩 상태
 const loading = ref(true)
 const error = ref('')
 
-// API 호출
+// API 호출 및 인증
 const { getUserInfo } = useUserApi()
+const { getUserIdFromToken } = useAuth()
 
 // 사용자 정보 로드
 const loadUserInfo = async () => {
@@ -246,9 +291,16 @@ const loadUserInfo = async () => {
     loading.value = true
     error.value = ''
 
-    console.log('API 호출 시작: getUserInfo with userId=1')
+    // JWT 토큰에서 userId 추출
+    const userId = getUserIdFromToken()
+    if (!userId) {
+      error.value = '로그인 정보를 찾을 수 없습니다. 다시 로그인해주세요.'
+      return
+    }
 
-    const response = await getUserInfo('1') // 고정된 ID 1 사용
+    console.log('API 호출 시작: getUserInfo with userId=', userId)
+
+    const response = await getUserInfo(userId)
 
     console.log('API 응답:', response)
 
@@ -271,7 +323,12 @@ const loadUserInfo = async () => {
         firstLoginDate: userInfo.userFirstLoginDtm || '로그인 이력 없음'
       }
 
+      // 자산 정보 설정 (0이면 0으로 표시)
+      pointBalance.value = userInfo.userPoint || 0
+      coinBalance.value = userInfo.userCoin || 0
+
       console.log('프로필 설정 완료:', profile.value)
+      console.log('자산 정보 설정 완료 - 포인트:', pointBalance.value, '코인:', coinBalance.value)
     } else {
       error.value = 'API에서 데이터를 받지 못했습니다.'
     }
