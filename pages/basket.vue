@@ -65,10 +65,10 @@
                     <p class="text-sm text-gray-500">{{ item.category }}</p>
                     <div class="mt-2">
                       <span v-if="item.originalPrice" class="text-sm text-gray-500 line-through mr-2">
-                        ₩{{ item.originalPrice.toLocaleString() }}
+                        {{ item.originalPrice.toLocaleString() }}원
                       </span>
                       <span class="text-lg font-bold text-gray-900">
-                        ₩{{ item.price.toLocaleString() }}
+                        {{ item.price.toLocaleString() }}원
                       </span>
                     </div>
                   </div>
@@ -77,13 +77,20 @@
                   <div class="flex items-center space-x-2">
                     <button
                       @click="decreaseQuantity(item)"
-                      class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                      class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      :disabled="item.quantity <= 1"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                       </svg>
                     </button>
-                    <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
+                    <input
+                      type="number"
+                      v-model="item.quantity"
+                      @blur="validateQuantity(item)"
+                      min="1"
+                      class="w-16 text-center border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                     <button
                       @click="increaseQuantity(item)"
                       class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
@@ -97,7 +104,7 @@
                   <!-- 개별 총 가격 -->
                   <div class="text-right">
                     <p class="text-lg font-bold text-gray-900">
-                      ₩{{ (item.price * item.quantity).toLocaleString() }}
+                      {{ (item.price * item.quantity).toLocaleString() }}원
                     </p>
                   </div>
 
@@ -124,20 +131,20 @@
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">상품금액</span>
-                <span class="font-medium">₩{{ subtotal.toLocaleString() }}</span>
+                <span class="font-medium">{{ subtotal.toLocaleString() }}원</span>
               </div>
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">할인금액</span>
-                <span class="font-medium text-red-600">-₩{{ discount.toLocaleString() }}</span>
+                <span class="font-medium text-red-600">-{{ discount.toLocaleString() }}원</span>
               </div>
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">배송비</span>
-                <span class="font-medium">{{ shippingFee === 0 ? '무료' : `₩${shippingFee.toLocaleString()}` }}</span>
+                <span class="font-medium">{{ shippingFee === 0 ? '무료' : `${shippingFee.toLocaleString()}원` }}</span>
               </div>
               <div class="border-t border-gray-200 pt-3">
                 <div class="flex justify-between">
                   <span class="text-lg font-semibold text-gray-900">총 결제금액</span>
-                  <span class="text-lg font-bold text-blue-600">₩{{ total.toLocaleString() }}</span>
+                  <span class="text-lg font-bold text-blue-600">{{ total.toLocaleString() }}원</span>
                 </div>
               </div>
             </div>
@@ -198,37 +205,17 @@ definePageMeta({
   middleware: ['auth']
 })
 
-// 장바구니 아이템 데이터
+// 장바구니 아이템 데이터 (프리미엄 무선 헤드폰만)
 const basketItems = ref([
   {
     id: 1,
     name: '프리미엄 무선 헤드폰',
     category: '전자제품',
-    price: 159000,
-    originalPrice: 199000,
-    quantity: 1,
-    selected: true,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 2,
-    name: '스마트 워치',
-    category: '웨어러블',
-    price: 299000,
+    price: 1000,
     originalPrice: null,
     quantity: 1,
     selected: true,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 3,
-    name: '노트북 백팩',
-    category: '가방',
-    price: 89000,
-    originalPrice: 129000,
-    quantity: 2,
-    selected: false,
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   }
 ])
 
@@ -271,6 +258,12 @@ const increaseQuantity = (item) => {
 const decreaseQuantity = (item) => {
   if (item.quantity > 1) {
     item.quantity--
+  }
+}
+
+const validateQuantity = (item) => {
+  if (item.quantity < 1) {
+    item.quantity = 1
   }
 }
 
