@@ -324,8 +324,8 @@ const loadUserInfo = async () => {
       }
 
       // 자산 정보 설정 (0이면 0으로 표시)
-      pointBalance.value = userInfo.userPoint || 0
-      coinBalance.value = userInfo.userCoin || 0
+      pointBalance.value = userInfo.pointBalance || 0
+      coinBalance.value = userInfo.coinBalance || 0
 
       console.log('프로필 설정 완료:', profile.value)
       console.log('자산 정보 설정 완료 - 포인트:', pointBalance.value, '코인:', coinBalance.value)
