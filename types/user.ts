@@ -1,4 +1,5 @@
 export interface UserInfo {
+  userId: string;
   userLoginId: string;
   userNm: string;
   userEmail: string;
