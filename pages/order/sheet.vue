@@ -348,6 +348,7 @@ const error = ref('')
 // API 호출 및 인증
 const { getUserInfo } = useUserApi()
 const { getUserIdFromToken } = useAuth()
+const { processPayment } = usePayment()
 
 // 계산된 속성들
 const subtotal = computed(() => {
@@ -494,9 +495,27 @@ const closePaymentDialog = () => {
   showPaymentDialog.value = false
 }
 
-const submitOrder = () => {
-  alert('주문이 완료되었습니다!')
-  // 여기서 실제 주문 처리 로직을 구현
+const submitOrder = async () => {
+  try {
+    // 결제 요청 데이터 구성
+    const paymentRequest = {
+      amount: finalAmount.value,
+      productName: orderItems.value.map(item => item.name).join(', '),
+      buyerName: orderForm.value.orderer.name,
+      buyerEmail: orderForm.value.orderer.email,
+      buyerTel: orderForm.value.orderer.phone,
+      merchantUid: '', // usePayment에서 생성
+      successUrl: `${window.location.origin}/payment/success`,
+      failUrl: `${window.location.origin}/payment/fail`
+    }
+
+    // 결제 처리
+    await processPayment(paymentRequest)
+
+  } catch (error) {
+    console.error('주문 처리 중 오류:', error)
+    alert('주문 처리 중 오류가 발생했습니다.')
+  }
 }
 
 // 컴포넌트 마운트 시 사용자 정보 로드
